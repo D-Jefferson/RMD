@@ -1,0 +1,72 @@
+import customtkinter as ctk
+import tkinter as tk
+import re
+
+ctk.set_appearance_mode("dark")
+ctk.set_default_color_theme("green")
+appWidth, appHeight = 740, 500
+
+def extrair_cpfs(texto):
+    padrao_cpf_formatado = r'\d{3}\.\d{3}\.\d{3}-\d{2}'
+    padrao_cpf_numerico = r'\b\d{11}\b'
+
+    cpfs_formatados = re.findall(padrao_cpf_formatado, texto)
+    cpfs_numericos = re.findall(padrao_cpf_numerico, texto)
+    
+    cpfs_formatados_limpos = [re.sub(r'\D', '', cpf) for cpf in cpfs_formatados]
+    
+    cpfs_todos = cpfs_formatados_limpos + cpfs_numericos
+    
+    return cpfs_todos
+
+def processar_cpfs(mensagem):
+    texto = app.inserir.get("1.0", tk.END)
+    cpfs = extrair_cpfs(texto)
+    if "Lista" in mensagem:
+        cpfs_com_virgula = '\n'.join(cpfs)
+    else:
+        cpfs_com_virgula = ', '.join(cpfs)
+
+    app.displayBox.delete("1.0", tk.END)
+    app.displayBox.insert(tk.END, mensagem + "\n" + cpfs_com_virgula)
+    
+    app.clipboard_clear()
+    app.clipboard_append(app.displayBox.get("1.0", tk.END).strip())
+    print("Texto copiado")
+
+def auto_colar(mensagem):
+    texto_copiado = app.clipboard_get()
+    app.inserir.delete("1.0", tk.END)
+    app.inserir.insert(tk.END, texto_copiado)
+    
+    processar_cpfs(mensagem)
+
+class App(ctk.CTk):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.title("Refiner Macro Dados @Jefferson")
+        self.geometry(f"{appWidth}x{appHeight}")
+        self.resizable(width=False, height=False)
+
+        self.inserir = ctk.CTkTextbox(self, width=283, height=200)
+        self.inserir.grid(row=1, column=1, padx=20, pady=20, sticky="nsew")
+
+        self.displayBox = ctk.CTkTextbox(self, width=283, height=200)
+        self.displayBox.grid(row=1, column=2, padx=20, pady=20, sticky="nsew")
+        
+        self.compartilhadoButton = ctk.CTkButton(self, text="Compartilhado", width=110, height=60, 
+                                                 command=lambda: auto_colar("Inserir Créditos Compartilhados"), fg_color="orange", hover_color="white", text_color="teal")
+        self.compartilhadoButton.grid(row=2, column=1, pady=10)
+
+        self.individualButton = ctk.CTkButton(self, text="Individual", width=110, height=60, 
+                                              command=lambda: auto_colar("Inserir Créditos Individuais"), fg_color="orange", hover_color="white", text_color="teal")
+        self.individualButton.grid(row=2, column=2, pady=10)
+
+        self.listaButton = ctk.CTkButton(self, text="Lista", width=110, height=60, 
+                                         command=lambda: auto_colar("Lista de CPFs:"), fg_color="orange", hover_color="white", text_color="teal")
+        self.listaButton.grid(row=3, column=1, columnspan=2, pady=10)
+
+if __name__ == "__main__":
+    app = App()
+    app.mainloop()
