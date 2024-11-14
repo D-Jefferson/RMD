@@ -1,4 +1,4 @@
-Primeira Versão do RMD - Refinador de MacroDados:
+Primeira Versão do RMD - Refinador de MacroDados executavel:
 
 Esta versão foi criada no principio do meu aprendizado com Python com uma interface simples e estranha, mas para primeiro projeto gostei bastante.
 Nesta época houve uma enorme demanda de CPFs e os clientes mandavam listas com pontos e traços e as vezes formatações diferentes de CPFs.
